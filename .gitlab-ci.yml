@@ -13,7 +13,7 @@ test:
         - when: never
     allow_failure: false
     script:
-        - cd src/${CI_PROJECT_NAME}.Tests
+        - cd src/${CI_PROJECT_TITLE}.Tests
         - dotnet test
 
 deploy:
