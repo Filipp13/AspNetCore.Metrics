@@ -1,0 +1,30 @@
+image: mcr.microsoft.com/dotnet/sdk:5.0
+
+stages:
+- test
+- deploy
+
+test:
+    stage: test
+    tags: [docker]
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+          when: always
+        - when: never
+    allow_failure: false
+    script:
+        - cd src/${CI_PROJECT_NAME}.Tests
+        - dotnet test
+
+deploy:
+    tags: [docker]
+    stage: deploy
+    rules:
+        - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+          when: on_success
+        - when: never
+    script:
+        - cd src/${CI_PROJECT_NAME}
+        - dotnet pack -c Release
+        - dotnet nuget add source "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/nuget/index.json" --name ${CI_PROJECT_NAME} --username ${DEPLOY_TOKEN_USER} --password ${DEPLOY_TOKEN} --store-password-in-clear-text
+        - dotnet nuget push "bin/Release/*.nupkg" --source ${CI_PROJECT_NAME}
