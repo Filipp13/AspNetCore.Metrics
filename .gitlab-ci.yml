@@ -24,7 +24,7 @@ deploy:
           when: on_success
         - when: never
     script:
-        - cd src/${CI_PROJECT_NAME}
+        - cd src/${CI_PROJECT_TITLE}
         - dotnet pack -c Release
         - dotnet nuget add source "${CI_API_V4_URL}/projects/$CI_PROJECT_ID/packages/nuget/index.json" --name ${CI_PROJECT_NAME} --username ${DEPLOY_TOKEN_USER} --password ${DEPLOY_TOKEN} --store-password-in-clear-text
         - dotnet nuget push "bin/Release/*.nupkg" --source ${CI_PROJECT_NAME}
